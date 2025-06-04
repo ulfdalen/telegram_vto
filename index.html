@@ -161,6 +161,7 @@
             width: 100%;
             height: 100%;
             border: none;
+            background: #000;
         }
         
         .close-btn {
@@ -239,7 +240,7 @@
     
     <div class="iframe-container" id="iframeContainer">
         <button class="close-btn" onclick="closeWebAR()">×</button>
-        <iframe id="webArFrame" allow="camera; microphone; gyroscope; accelerometer"></iframe>
+        <iframe id="webArFrame" allow="camera *; microphone *; gyroscope *; accelerometer *; autoplay *; encrypted-media *" allowfullscreen></iframe>
     </div>
 
     <script>
@@ -258,29 +259,24 @@
             document.querySelector('.loading').style.display = 'block';
             document.querySelector('.launch-btn').style.display = 'none';
             
-            // Check if we're in Telegram
-            if (tg.platform !== 'unknown') {
-                // In Telegram, open in external browser for better camera access
-                setTimeout(() => {
-                    tg.openLink('https://projects.geenee.ar/sunglasshut-summer-25/');
-                    document.querySelector('.loading').style.display = 'none';
-                    document.querySelector('.launch-btn').style.display = 'inline-block';
-                }, 1000);
-            } else {
-                // Not in Telegram, open in iframe
-                setTimeout(() => {
-                    const iframe = document.getElementById('webArFrame');
-                    iframe.src = 'https://projects.geenee.ar/sunglasshut-summer-25/';
-                    document.getElementById('iframeContainer').style.display = 'block';
-                    document.querySelector('.loading').style.display = 'none';
-                    document.querySelector('.launch-btn').style.display = 'inline-block';
-                }, 1000);
-            }
+            // Always open in iframe for embedded experience
+            setTimeout(() => {
+                const iframe = document.getElementById('webArFrame');
+                iframe.src = 'https://projects.geenee.ar/sunglasshut-summer-25/';
+                document.getElementById('iframeContainer').style.display = 'block';
+                document.querySelector('.loading').style.display = 'none';
+                document.querySelector('.launch-btn').style.display = 'inline-block';
+                
+                // Show back button when iframe opens
+                tg.BackButton.show();
+            }, 1000);
         }
         
         function closeWebAR() {
             document.getElementById('iframeContainer').style.display = 'none';
             document.getElementById('webArFrame').src = '';
+            // Hide back button when closing iframe
+            tg.BackButton.hide();
         }
         
         // Handle back button
@@ -289,15 +285,6 @@
                 closeWebAR();
             } else {
                 tg.close();
-            }
-        });
-        
-        // Show back button when iframe is open
-        document.getElementById('iframeContainer').addEventListener('transitionend', function() {
-            if (this.style.display === 'block') {
-                tg.BackButton.show();
-            } else {
-                tg.BackButton.hide();
             }
         });
         
